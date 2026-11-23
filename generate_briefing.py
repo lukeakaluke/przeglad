@@ -118,10 +118,9 @@ SUROWE DANE:
 """
 
     models_to_try = [
+        "gemini-3.5-flash-lite",
         "gemini-3.8-flash",
-        "gemini-3.8-flash-lite",
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-pro",
+        "gemini-3.1-pro-preview",
     ]
 
     last_error = None
