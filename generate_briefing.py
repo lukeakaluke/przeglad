@@ -117,17 +117,32 @@ SUROWE DANE:
 {articles_text}
 """
 
-    response = client.models.generate_content(
-        model="gemini-3.8-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=DailyBriefing,
-            temperature=0.2,
-        ),
-    )
+    models_to_try = [
+        "gemini-3.8-flash",
+        "gemini-3.8-flash-lite",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-pro",
+    ]
 
-    return DailyBriefing.model_validate_json(response.text)
+    last_error = None
+    for model_name in models_to_try:
+        try:
+            print(f"Próbuję wygenerować przegląd modelem: {model_name}...")
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=DailyBriefing,
+                    temperature=0.2,
+                ),
+            )
+            return DailyBriefing.model_validate_json(response.text)
+        except Exception as e:
+            print(f"[WARN] Model {model_name} nie zadziałał: {e}")
+            last_error = e
+
+    raise last_error
 
 
 def render_section(title: str, items: list[NewsItem]) -> str:
